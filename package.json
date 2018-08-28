@@ -18,7 +18,6 @@
     "react-markdown": "^3.4.1",
     "whatwg-fetch": "^2.0.4"
   },
-
   "scripts": {
     "start:server": "cd backend && nodemon server.js --exec babel-node --presets es2015,stage-0",
     "start:client": "cd client && yarn start",
