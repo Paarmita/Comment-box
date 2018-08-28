@@ -14,6 +14,14 @@ cd Comment-box
 ```
 npm install
 ```
+* Add the db.js file in backend folder.
+```
+const secrets = {
+  dbUri: 'mongodb://url'
+};
+
+export const getSecret = key => secrets[key];
+```
 * Now typing to start client and server concurrently
 ```
  sudo fuser -k 8080/tcp 
