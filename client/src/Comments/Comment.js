@@ -2,7 +2,6 @@ import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
-import moment from 'moment';
 
 const Comment = props => (
   <div className="singleComment">

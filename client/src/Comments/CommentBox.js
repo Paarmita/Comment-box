@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import 'whatwg-fetch';
 import CommentList from './CommentList';
 import CommentForm from './CommentForm';
+import './CommentBox.css';
 
 class CommentBox extends Component {
   constructor() {
@@ -10,7 +11,8 @@ class CommentBox extends Component {
       data: [],
       error: null,
       author: '',
-      text: ''
+      comment: '',
+      updateId: null,
     };
     this.pollInterval = null;
   }
@@ -23,24 +25,25 @@ class CommentBox extends Component {
   }
 
   componentWillUnmount() {
-    if (this.pollInterval) clearInterval(this.pollInterval);
-    this.pollInterval = null;
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
   }
 
   onChangeText = (e) => {
+    console.log('onChangeText ',this.state);
     const newState = { ...this.state };
     newState[e.target.name] = e.target.value;
     this.setState(newState);
   }
 
   onUpdateComment = (id) => {
+
     const oldComment = this.state.data.find(c => c._id === id);
+    console.log('oldComment ',oldComment);
     if (!oldComment) return;
-    this.setState({
-        author: oldComment.author,
-        text: oldComment.text,
-        updateId: id
-    });
+    this.setState({ author: oldComment.author, text: oldComment.text, updateId: id });
   }
 
   onDeleteComment = (id) => {
@@ -50,36 +53,33 @@ class CommentBox extends Component {
       ...this.state.data.slice(i + 1),
     ];
     this.setState({ data });
+    console.log('onDeleteComment ',data);
     fetch(`api/comments/${id}`, { method: 'DELETE' })
       .then(res => res.json()).then((res) => {
         if (!res.success) this.setState({ error: res.error });
       });
+
   }
 
   submitComment = (e) => {
     e.preventDefault();
     const { author, text, updateId } = this.state;
     if (!author || !text) return;
+
     if (updateId) {
       this.submitUpdatedComment();
     } else {
       this.submitNewComment();
     }
+
   }
 
   submitNewComment = () => {
     const { author, text } = this.state;
-    const data = [
-      ...this.state.data,
-      {
-        author,
-          text,
-          _id: Date.now().toString(),
-          updatedAt: new Date(),
-          createdAt: new Date()
-      },
-    ];
+    const data = [...this.state.data, { author, text, _id: Date.now().toString() }];
     this.setState({ data });
+    console.log('submitNewComment ',data);
+
     fetch('/api/comments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -102,28 +102,11 @@ class CommentBox extends Component {
     });
   }
 
-
-  submitComment = (e) => {
-    e.preventDefault();
-    const { author, comment } = this.state;
-    if (!author || !comment) return;
-    fetch('http://localhost:8080/api/comments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ author, comment }),
-    }).then(res => res.json()).then((res) => {
-      if (!res.success) this.setState({ error: res.error.message || res.error });
-      else this.setState({ author: '', text: '', error: null });
-    });
-  }
-
   loadCommentsFromServer = () => {
     // fetch returns a promise. If you are not familiar with promises, see
-    fetch('http://localhost:8080/api/comments')
-      .then((data)=>{
-        console.log('-------',data);
-        return data
-      }) 
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
+    fetch('/api/comments/')
+      .then(data => data.json())
       .then((res) => {
         if (!res.success) this.setState({ error: res.error });
         else this.setState({ data: res.data });
@@ -136,16 +119,18 @@ class CommentBox extends Component {
         <div className="comments">
           <h2>Comments:</h2>
           <CommentList
-              data={this.state.data}
-              handleDeleteComment={this.onDeleteComment}
-              handleUpdateComment={this.onUpdateComment}/>
+            data={this.state.data}
+            handleDeleteComment={this.onDeleteComment}
+            handleUpdateComment={this.onUpdateComment}
+          />
         </div>
         <div className="form">
-        <CommentForm
-              author={this.state.author}
-              text={this.state.text}
-              handleChangeText={this.onChangeText}
-              handleSubmit={this.submitComment}/>
+          <CommentForm
+            author={this.state.author}
+            text={this.state.text}
+            handleChangeText={this.onChangeText}
+            submitComment={this.submitComment}
+          />
         </div>
         {this.state.error && <p>{this.state.error}</p>}
       </div>
