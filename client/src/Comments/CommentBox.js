@@ -27,16 +27,19 @@ class CommentBox extends Component {
   componentWillUnmount() {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
-      this.pollInterval = null;
-    }
+      this.pollInterval = null;}
+    
   }
 
   onChangeText = (e) => {
+
     console.log('onChangeText ',this.state);
     const newState = { ...this.state };
     newState[e.target.name] = e.target.value;
     this.setState(newState);
   }
+
+  
 
   onUpdateComment = (id) => {
 
@@ -54,9 +57,21 @@ class CommentBox extends Component {
     ];
     this.setState({ data });
     console.log('onDeleteComment ',data);
-    fetch(`api/comments/${id}`, { method: 'DELETE' })
-      .then(res => res.json()).then((res) => {
-        if (!res.success) this.setState({ error: res.error });
+    console.log('delete id', id);
+    fetch(`api/comments/${id}`,{ 
+      method: 'DELETE', 
+    
+   })
+     
+      .then(res => {
+        console.log('res-----',res);
+        var stringify = JSON.stringify(data); 
+        JSON.parse(stringify)
+      })
+      .catch((err) => {
+        console.log('err',err);
+        this.setState({ error: err })
+      ;
       });
 
   }
@@ -84,7 +99,8 @@ class CommentBox extends Component {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ author, text }),
-    }).then(res => res.json()).then((res) => {
+    })
+    .then(res => res.json()).then((res) => {
       if (!res.success) this.setState({ error: res.error.message || res.error });
       else this.setState({ author: '', text: '', error: null });
     });
