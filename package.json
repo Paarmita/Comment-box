@@ -21,7 +21,8 @@
   },
   "scripts": {
     "start:server": "cd backend && node server.js --exec babel-node --presets es2015,stage-0",
-    "start:client": "cd client && yarn start",
-    "start": "concurrently \"yarn start:server\" \"yarn start:client\""
+    "start:client": "cd client && npm start",
+    "start": "npm run start:server | npm run start:client"
+
   }
 }
