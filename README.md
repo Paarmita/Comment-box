@@ -1,4 +1,7 @@
 # Comment-box
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/Paarmita/Comment-box.svg)](https://greenkeeper.io/)
+
 MERN stack application
 
 ## Installation
